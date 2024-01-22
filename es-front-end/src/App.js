@@ -1,15 +1,24 @@
-import "./App.css";
+import "./css/nav.css";
+import "./App.css"
 import React, { Component } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./components/Home";
+import routes from './routes';
+import NavBar from "./components/NavBar";
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-      </Routes>
-    </BrowserRouter>
+    <Router>
+    <NavBar />
+      <div className="container mt-4">
+        <Routes>
+          {routes.map((route, index) => (
+            <Route key={index} path={route.path} element={route.component} />
+          ))}
+        </Routes>
+      </div>
+    </Router>
   );
 };
 
