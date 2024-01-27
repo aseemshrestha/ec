@@ -7,7 +7,7 @@ public class AppConstants {
     public interface Welcome {
         String WELCOME_PASS_SUBJECT = "Welcome to Education Consultancy";
         String WELCOME_MESSAGE =
-                "Thank you for signing up.\n "
+                "Thank you for signing up. You admin account is created successfully. \n "
                         + "Super excited to have you on board, we know you’ll just love us.\n ";
     }
 

@@ -34,7 +34,7 @@ public class DbSeed implements CommandLineRunner {
         maintainer1.setEmail("sanjaykarki555@gmail.com");
 
         Maintainer maintainer2 = new Maintainer();
-        maintainer2.setEmail("pdhungel@gmail.com ");
+        maintainer2.setEmail("pdhungel@gmail.com");
 
         Maintainer maintainer3 = new Maintainer();
         maintainer3.setEmail("shrestha.asm@gmail.com");

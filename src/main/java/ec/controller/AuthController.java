@@ -4,6 +4,7 @@ import ec.constants.AppConstants;
 import ec.constants.MailType;
 import ec.constants.RoleBuilder;
 import ec.constants.UserStatus;
+import ec.model.ErrorMessage;
 import ec.model.LoginDto;
 import ec.model.Mail;
 import ec.model.Maintainer;
@@ -25,6 +26,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,6 +41,7 @@ import java.util.Optional;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin
 public class AuthController {
     private final UserAndRoleService userAndRoleService;
 
@@ -98,7 +101,7 @@ public class AuthController {
     }
 
     @PostMapping("v1/public/create-user")
-    public ResponseEntity<User> createUser(@RequestBody @Valid User user, HttpServletRequest request) throws InterruptedException {
+    public ResponseEntity<?> createUser(@RequestBody @Valid User user, HttpServletRequest request) throws InterruptedException {
 
         List<Maintainer> maintainers = maintainerRepository.findAll();
         boolean isAllowed = false;
@@ -109,8 +112,20 @@ public class AuthController {
             }
         }
         if (!isAllowed) {
-            return new ResponseEntity<>(new User(), HttpStatus.FORBIDDEN);
+            log.info("email is not whitelisted to register: " + user.getEmail());
+            ErrorMessage errorMessage = new ErrorMessage("Not enough permission to register", HttpStatus.BAD_REQUEST.name());
+            return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
         }
+
+        Optional<User> userExisting = userAndRoleService.getUser(user.getEmail());
+
+        if (userExisting.isPresent() && userExisting.get().getEmail().equals(user.getEmail())) {
+            log.info("email already exists: " + user.getEmail());
+            ErrorMessage errorMessage = new ErrorMessage("Email already exists", HttpStatus.BAD_REQUEST.name());
+            return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+        }
+
+
         UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
 
         String ip = request.getHeader("X-FORWARDED-FOR");
@@ -127,7 +142,7 @@ public class AuthController {
         user.setCreated(new Date());
         user.setIsActive(UserStatus.ACTIVE.get());
 
-        final User savedUser = this.userAndRoleService.saveUser(user);
+        this.userAndRoleService.saveUser(user);
 
         log.info("User successfully created:" + "name:" + user.getFirstName() + " " + user.getLastName() + " " + user.getEmail());
         Mail mail =
@@ -135,9 +150,9 @@ public class AuthController {
                         .name(user.getFirstName())
                         .username(user.getUsername())
                         .message(AppConstants.Welcome.WELCOME_MESSAGE).build();
-        System.out.println("Current Thread:" + Thread.currentThread().getName());
+
         emailService.sendMail(mail, MailType.WELCOME);
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+        return new ResponseEntity<>("You have successfully registered. You may now login.", HttpStatus.CREATED);
     }
 
 }

@@ -63,7 +63,6 @@ public class User  {
     @LastModifiedDate
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date lastUpdated;
-    private String gender;
 
     @ManyToOne
     @JoinColumn
