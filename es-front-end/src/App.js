@@ -46,7 +46,7 @@ function App() {
                     <Route path={`${process.env.PUBLIC_URL + "/team"}`} component={TeamMember} />
                     <Route path={`${process.env.PUBLIC_URL + "/testimonial"}`} component={Testimonials} />
                     <Route path={`${process.env.PUBLIC_URL + "/price"}`} component={PriceTable} />
-                    <Route path={`${process.env.PUBLIC_URL + "/login"}`} component={Login} />
+                    <Route path={`${process.env.PUBLIC_URL + "/loginmein"}`} component={Login} />
                     <Route path={`${process.env.PUBLIC_URL + "/register"}`} component={Registration} />
                     <Route path={`${process.env.PUBLIC_URL + "/faq"}`} component={Faq} />
                     <Route path={`${process.env.PUBLIC_URL + "/error"}`} component={Error} />

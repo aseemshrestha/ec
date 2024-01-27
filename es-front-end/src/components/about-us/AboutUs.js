@@ -35,7 +35,7 @@ const AboutUs = () => {
                                                     <i className="las la-check-circle"></i>
                                                 </div>
                                                 <div className="icon-text">
-                                                    <p>Itaque consequatur omnis voluptatem sunt eius ipsam tenetur quod impedit dolor cum.</p>
+                                                    <p>{Data.iconTextOne}</p>
                                                 </div>
                                             </div>
                                             <div className="box-item d-flex">

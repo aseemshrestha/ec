@@ -28,34 +28,7 @@ export default function RegistrationForm() {
                </p>
             </div>
             <div className="col-md-12">
-               <div className="save-forget-password d-flex justify-content-between">
-                  <p className="keep-loged">
-                     <label className="choice" htmlFor="keep_loged">
-                        <input {...register("keeplog", { required: false })} type="checkbox" id="keep_loged" />
-                        Keep me loged in
-                     </label>
-                  </p>
-                  <p className="forget-pass">
-                     <Link to={process.env.PUBLIC_URL + "/"}>Forget Password?</Link>
-                  </p>
-               </div>
-            </div>
-            <div className="col-md-12">
-               <button className="submit-btn btn btn-primary" type="submit">Register</button>
-            </div>
-            <div className="col-md-12">
-               <div className="signup-btn text-center">
-                  <p>New to Afily? <Link to={process.env.PUBLIC_URL + "/register"}>Sign Up</Link></p>
-               </div>
-               <div className="social-login text-center">
-                  <span>OR</span>
-                  <p>Sign up with social</p>
-                  <ul className="list-unstyled list-inline">
-                     <li className="list-inline-item"><a href={process.env.PUBLIC_URL + "/"}><i className="fab fa-google"></i> Google</a></li>
-                     <li className="list-inline-item"><a href={process.env.PUBLIC_URL + "/"}><i className="fab fa-facebook-f"></i> Facebook</a></li>
-                     <li className="list-inline-item"><a href={process.env.PUBLIC_URL + "/"}><i className="fab fa-twitter"></i> Twitter</a></li>
-                  </ul>
-               </div>
+               <button className="submit-btn btn btn-primary" type="submit">LOGIN</button>
             </div>
          </div>
       </form>
