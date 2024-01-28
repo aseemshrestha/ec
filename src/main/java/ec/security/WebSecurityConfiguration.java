@@ -78,11 +78,11 @@ public class WebSecurityConfiguration {
         configuration.setAllowedOrigins(asList("*"));
         configuration.setAllowedHeaders(asList("Access-Control-Allow-Headers", "Access-Control-Allow-Origin",
                 "Access-Control-Request-Method", "Access-Control-Request-Headers",
-                "Origin", "Cache-Control", "Content-Type", "Authorization", "FullName"));
+                "Origin", "Cache-Control", "Content-Type", "Authorization", "access-token","refresh-token"));
         configuration.setExposedHeaders(asList("Access-Control-Allow-Headers",
-                "Authorization", "FullName",
+                "Authorization",
                 "Access-Control-Allow-Headers, Origin, Accept, X-Requested-With",
-                "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"));
+                "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers,access-token,refresh-token"));
 
         configuration.setAllowedMethods(asList("GET", "POST", "PUT", "DELETE", "PATCH"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

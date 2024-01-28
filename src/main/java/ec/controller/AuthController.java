@@ -5,6 +5,7 @@ import ec.constants.MailType;
 import ec.constants.RoleBuilder;
 import ec.constants.UserStatus;
 import ec.model.ErrorMessage;
+import ec.model.JwtResponse;
 import ec.model.LoginDto;
 import ec.model.Mail;
 import ec.model.Maintainer;
@@ -56,23 +57,22 @@ public class AuthController {
 
 
     @PostMapping("/v1/public/login")
-    public ResponseEntity<String> signIn(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<JwtResponse> signIn(@RequestBody LoginDto loginDto) {
 
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
 
-        var user = userAndRoleService.getUser(loginDto.getUsername());
+        var user = userAndRoleService.getUser(loginDto.getEmail());
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("User Not Found");
         }
         var accessToken = jwtService.generateToken(user.get().getEmail());
         var refreshToken = jwtService.generateRefreshToken(new HashMap<>(), user.get().getEmail());
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("access-token", "Bearer " + accessToken);
-        responseHeaders.set("refresh-token", refreshToken);
 
-        return ResponseEntity.ok()
-                .headers(responseHeaders)
-                .body("SignIn Successful");
+        JwtResponse jwtResponse = new JwtResponse();
+        jwtResponse.setAccessToken(accessToken);
+        jwtResponse.setRefreshToken(refreshToken);
+
+        return new ResponseEntity<>(jwtResponse, HttpStatus.OK);
     }
 
 
