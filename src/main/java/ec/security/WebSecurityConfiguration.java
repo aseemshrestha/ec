@@ -4,11 +4,10 @@ import ec.constants.RoleBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,6 +19,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
+
 import static java.util.Arrays.asList;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -37,8 +39,9 @@ public class WebSecurityConfiguration {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(req -> {
-                            req.requestMatchers("/**","/about")
+                            req.requestMatchers("/api/v1/public/**")
                                     .permitAll()
                                     .requestMatchers("/api/v1/secured/**")
                                     .hasRole(ROLE_ADMIN);
@@ -71,14 +74,14 @@ public class WebSecurityConfiguration {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
+
     @Bean
-    CorsConfigurationSource corsConfigurationSource()
-    {
+    CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(asList("*"));
+        configuration.setAllowedOrigins(List.of("*"));
         configuration.setAllowedHeaders(asList("Access-Control-Allow-Headers", "Access-Control-Allow-Origin",
                 "Access-Control-Request-Method", "Access-Control-Request-Headers",
-                "Origin", "Cache-Control", "Content-Type", "Authorization", "access-token","refresh-token"));
+                "Origin", "Cache-Control", "Content-Type", "Authorization"));
         configuration.setExposedHeaders(asList("Access-Control-Allow-Headers",
                 "Authorization",
                 "Access-Control-Allow-Headers, Origin, Accept, X-Requested-With",
