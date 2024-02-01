@@ -66,5 +66,7 @@ public class Student {
 
     @Column(nullable = false)
     private String enteredBy;
+    @Column(nullable = false)
+    private String visaStatus;
 
 }

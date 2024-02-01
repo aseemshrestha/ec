@@ -3,9 +3,11 @@ package ec.service;
 import ec.model.Student;
 import ec.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,5 +22,19 @@ public class StudentService {
 
     public Optional<Student> findStudentByEmail(String email) {
         return studentRepository.findByEmail(email);
+    }
+    public Optional<Student> findStudentById(Long id) {
+        return studentRepository.findById(id);
+    }
+
+
+    public List<Student> getAllActiveStudents() {
+        return studentRepository.findAllActiveStudents();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Modifying
+    public void deleteById(Long id) {
+        studentRepository.deleteStudentById(id);
     }
 }
