@@ -4,6 +4,7 @@ import ec.constants.UserStatus;
 import ec.constants.VStatus;
 import ec.model.Student;
 import ec.model.StudentDTO;
+import ec.repository.StudentRepository;
 import ec.service.StudentService;
 import ec.util.DateFormatter;
 import eu.bitwalker.useragentutils.UserAgent;
@@ -15,14 +16,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,6 +35,7 @@ import java.util.Optional;
 public class AdminController {
 
     private final StudentService studentService;
+    private final StudentRepository studentRepository;
 
     @GetMapping("/dashboard")
     public ResponseEntity<?> dashboard() {
@@ -77,39 +78,54 @@ public class AdminController {
             studentDTO.setPhone(s.getPhone());
             studentDTO.setUniversityApplied(s.getUniName());
             studentDTO.setI20Status(s.getService());
-            if (s.getInterviewDate() == null) {
-                studentDTO.setVisaInterviewDate("Not Applied");
-            } else {
-                studentDTO.setVisaInterviewDate(s.getInterviewDate().toString());
-            }
+            studentDTO.setVisaInterviewDate(s.getInterviewDate() == null ? null : s.getInterviewDate().toString());
             studentDTO.setVisaStatus(s.getVisaStatus());
             studentDTO.setCreatedDate(DateFormatter.formatDateToString(s.getCreated(), "MMM dd yyyy", "EST"));
+            studentDTO.setAdditionalComments(s.getMessage());
             studentDTOS.add(studentDTO);
         });
 
         return new ResponseEntity<>(studentDTOS, HttpStatus.OK);
     }
 
-    @PatchMapping("/updateStudent")
-    public ResponseEntity<Student> updateStudent(@RequestBody Student student, @PathVariable Long id, HttpServletRequest request) {
-        Optional<Student> studentById = this.studentService.findStudentById(id);
+    @PutMapping("/secured/updateStudent")
+    public ResponseEntity<Student> updateStudent(@RequestBody StudentDTO studentDto, HttpServletRequest request) throws ParseException {
+        Optional<Student> studentById = this.studentService.findStudentById(studentDto.getId());
         if (studentById.isEmpty()) {
             throw new UsernameNotFoundException("Student Not Found");
         }
-        student.setFirstName(student.getFirstName());
-        student.setLastName(student.getLastName());
-        student.setUniName(student.getUniName());
-        student.setEmail(student.getEmail());
-        student.setVisaStatus(student.getVisaStatus());
-        student.setInterviewDate(student.getInterviewDate());
-        student.setVisaStatus(student.getVisaStatus());
-        student.setAdditionalComments(student.getAdditionalComments());
-        student.setLastUpdated(student.getLastUpdated());
-        student.setIsActive(student.getIsActive());
-        student.setService(student.getService());
+        UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
+
+        String ip = request.getHeader("X-FORWARDED-FOR");
+        if (ip == null) {
+            ip = request.getRemoteAddr();
+        }
+        Student student = new Student();
+        student.setId(studentDto.getId());
+        student.setFirstName(studentDto.getFirstName());
+        student.setLastName(studentDto.getLastName());
+        student.setUniName(studentDto.getUniversityApplied());
+        student.setEmail(studentDto.getEmail());
+        student.setPhone(studentDto.getPhone());
+        student.setVisaStatus(studentDto.getVisaStatus());
+        student.setMessage(studentDto.getAdditionalComments());
+
+        student.setInterviewDate(DateFormatter.formatStringToDateOnly(studentDto.getVisaInterviewDate(), "yyyy-MM-dd"));
+        student.setVisaStatus(studentDto.getVisaStatus());
+        student.setService(studentDto.getI20Status());
         student.setEnteredBy(request.getUserPrincipal().getName());
+
+        student.setCreated(studentById.get().getCreated());
+        student.setEnteredBy(studentById.get().getEnteredBy());
+        student.setLastUpdated(new Date());
+        student.setIp(ip);
+        student.setIsActive(UserStatus.ACTIVE.get());
+        student.setBrowser(userAgent.getBrowser().getName());
         studentService.addStudent(student);
-        return new ResponseEntity<Student>(student, HttpStatus.OK);
+
+
+
+        return new ResponseEntity<>(student, HttpStatus.OK);
     }
 
     @PostMapping("/secured/deleteStudent")

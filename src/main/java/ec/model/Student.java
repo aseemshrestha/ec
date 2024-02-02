@@ -45,7 +45,8 @@ public class Student {
     @Column(name = "interviewDate")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date interviewDate;
-    private String additionalComments;
+    @Column(name = "additionalComments")
+    private String message;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String ip;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

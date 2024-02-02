@@ -15,6 +15,8 @@ public class StudentDTO {
     private String visaInterviewDate;
     private String visaStatus;
 
+    private String additionalComments;
+
     private String createdDate;
 
 }
