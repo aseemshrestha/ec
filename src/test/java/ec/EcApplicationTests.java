@@ -4,7 +4,9 @@ import ec.util.DateFormatter;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -17,6 +19,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -26,6 +29,7 @@ class EcApplicationTests {
 	@Test
 	void contextLoads() {
 	}
+
 
 	@Test
 	public void  test() throws ParseException {
@@ -76,6 +80,11 @@ class EcApplicationTests {
 		Date date2 = DateFormatter.formatStringToDateOnly(existingDate, "yyyy-MM-dd");
 		System.out.println("Date 2:" + date2);
 
+		String s = Base64.getEncoder().encodeToString("root".getBytes());
+		System.out.println(s);
+		byte[] decode = Base64.getDecoder().decode(s);
+		String d = new String(decode);
+		System.out.println(d);
 	}
 
 }

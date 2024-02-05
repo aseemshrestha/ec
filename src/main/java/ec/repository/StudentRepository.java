@@ -1,6 +1,5 @@
 package ec.repository;
 
-import ec.constants.UserStatus;
 import ec.model.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -22,4 +21,9 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     @Query("UPDATE Student s SET s.isActive = 4 where s.id = :id")
     @Modifying
     void deleteStudentById(@Param("id") Long id);
+
+    @Query("SELECT s FROM Student s WHERE s.firstName LIKE %:keyword% or s.phone LIKE %:keyword% or s.email LIKE %:keyword%")
+    Optional<List<Student>> findStudentByFirstNameOrEmailOrPhone(String keyword);
+
+
 }

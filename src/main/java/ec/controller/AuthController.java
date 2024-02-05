@@ -4,18 +4,13 @@ import ec.constants.AppConstants;
 import ec.constants.MailType;
 import ec.constants.RoleBuilder;
 import ec.constants.UserStatus;
-import ec.model.ErrorMessage;
-import ec.model.JwtResponse;
-import ec.model.LoginDto;
-import ec.model.Mail;
-import ec.model.Maintainer;
-import ec.model.User;
+import ec.model.*;
 import ec.repository.MaintainerRepository;
 import ec.security.JwtService;
 import ec.security.RefreshTokenRequest;
 import ec.service.EmailService;
 import ec.service.UserAndRoleService;
-import eu.bitwalker.useragentutils.UserAgent;
+import ec.util.IpAndBrowserGetter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,17 +22,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
@@ -126,20 +113,11 @@ public class AuthController {
             ErrorMessage errorMessage = new ErrorMessage("Email already exists", HttpStatus.BAD_REQUEST.name());
             return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
         }
-
-
-        UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
-
-        String ip = request.getHeader("X-FORWARDED-FOR");
-        if (ip == null) {
-            ip = request.getRemoteAddr();
-        }
-
         user.setPassword(this.passwordEncoder.encode(user.getPassword()));
-        user.setIp(ip);
+        user.setIp(IpAndBrowserGetter.getIp(request));
         user.setLastUpdated(new Date());
         user.setUsername(user.getEmail());
-        user.setBrowser(userAgent.getBrowser().getName() + "-" + userAgent.getOperatingSystem());
+        user.setBrowser(IpAndBrowserGetter.getBrowserAndOs(request));
         user.setRole(RoleBuilder.getRoleAdmin());
         user.setCreated(new Date());
         user.setIsActive(UserStatus.ACTIVE.get());
@@ -148,7 +126,8 @@ public class AuthController {
 
         log.info("User successfully created:" + "name:" + user.getFirstName() + " " + user.getLastName() + " " + user.getEmail());
         Mail mail =
-                Mail.builder().toEmail(user.getEmail()).subject(AppConstants.Welcome.WELCOME_PASS_SUBJECT)
+                Mail.builder().toEmail(user.getEmail())
+                        .subject(AppConstants.Welcome.WELCOME_PASS_SUBJECT)
                         .name(user.getFirstName())
                         .username(user.getUsername())
                         .message(AppConstants.Welcome.WELCOME_MESSAGE).build();

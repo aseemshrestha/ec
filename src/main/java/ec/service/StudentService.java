@@ -23,6 +23,7 @@ public class StudentService {
     public Optional<Student> findStudentByEmail(String email) {
         return studentRepository.findByEmail(email);
     }
+
     public Optional<Student> findStudentById(Long id) {
         return studentRepository.findById(id);
     }
@@ -36,5 +37,9 @@ public class StudentService {
     @Modifying
     public void deleteById(Long id) {
         studentRepository.deleteStudentById(id);
+    }
+
+    public Optional<List<Student>> findStudentByFirstNameEmailPhone(String keyword) {
+        return studentRepository.findStudentByFirstNameOrEmailOrPhone(keyword);
     }
 }

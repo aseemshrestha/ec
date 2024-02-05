@@ -3,48 +3,49 @@ package ec.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.util.Date;
 
-@Entity
-@Table(name = "student")
 @Data
-public class Student {
+@Table(name = "university")
+@Entity
+public class University {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
 
     @Column(nullable = false)
-    private String firstName;
+    private String universityName;
 
     @Column(nullable = false)
-    private String lastName;
+    private String universityAddress;
 
-    @Column(nullable = false, length = 200)
-    private String email;
+    @Column(nullable = true)
+    private String universityAddress1;
+    @Column(nullable = true)
+    private String universityContactPerson;
 
     @Column(nullable = false)
-    private String uniName;
+    private String universityPhone;
     @Column(nullable = false)
     private String phone;
-
-    @Column(nullable = false, name = "i20Status")
-    private String service;
-
-    @Column(name = "interviewDate")
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Date interviewDate;
     @Column(name = "additionalComments")
-    private String message;
+    private String additionalComments;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String ip;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String browser;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private int isActive;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "approvalDate")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Date approvalDate;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created", nullable = false, updatable = false)
     @CreatedDate
@@ -59,7 +60,6 @@ public class Student {
 
     @Column(nullable = false)
     private String enteredBy;
-    @Column(nullable = false)
-    private String visaStatus;
+
 
 }
