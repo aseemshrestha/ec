@@ -17,6 +17,8 @@ public class StudentDTO {
 
     private String additionalComments;
 
+    private String status;
+
     private String createdDate;
 
 }

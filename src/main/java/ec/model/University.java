@@ -18,7 +18,7 @@ public class University {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String universityName;
 
     @Column(nullable = false)
@@ -27,10 +27,7 @@ public class University {
     @Column(nullable = true)
     private String universityAddress1;
     @Column(nullable = true)
-    private String universityContactPerson;
-
-    @Column(nullable = false)
-    private String universityPhone;
+    private String contactPerson;
     @Column(nullable = false)
     private String phone;
     @Column(name = "additionalComments")
@@ -39,8 +36,15 @@ public class University {
     private String ip;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String browser;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+
     private int isActive;
+
+   // @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Column(name = "status")
+    private String service;
+
+    @Column(name = "email", unique = true)
+    private String email;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "approvalDate")

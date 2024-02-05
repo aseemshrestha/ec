@@ -2,11 +2,10 @@ package ec.controller;
 
 import ec.constants.UserStatus;
 import ec.constants.VStatus;
-import ec.model.EntityModelMapper;
-import ec.model.Search;
-import ec.model.Student;
-import ec.model.StudentDTO;
+import ec.exceptions.ResourceNotFoundException;
+import ec.model.*;
 import ec.service.StudentService;
+import ec.service.UniversityService;
 import ec.util.DateFormatter;
 import ec.util.IpAndBrowserGetter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -29,6 +27,8 @@ import java.util.Optional;
 @CrossOrigin
 public class AdminController {
     private final StudentService studentService;
+    private final UniversityService universityService;
+
     @PostMapping("/secured/addStudent")
     public ResponseEntity<?> addStudent(@RequestBody @Valid Student student, HttpServletRequest request) {
 
@@ -56,7 +56,7 @@ public class AdminController {
     public ResponseEntity<Student> updateStudent(@RequestBody StudentDTO studentDto, HttpServletRequest request) throws ParseException {
         Optional<Student> studentById = this.studentService.findStudentById(studentDto.getId());
         if (studentById.isEmpty()) {
-            throw new UsernameNotFoundException("Student Not Found");
+            throw new ResourceNotFoundException("Student Not Found");
         }
         var student = new Student();
         student.setId(studentDto.getId());
@@ -86,7 +86,7 @@ public class AdminController {
     public ResponseEntity<?> deleteStudent(@RequestBody StudentDTO student) {
         Optional<Student> studentById = this.studentService.findStudentById(student.getId());
         if (studentById.isEmpty()) {
-            throw new UsernameNotFoundException("Student Not Found");
+            throw new ResourceNotFoundException("Student Not Found");
         }
         studentService.deleteById(student.getId());
 
@@ -100,24 +100,33 @@ public class AdminController {
         }
         Optional<List<Student>> allStudents = this.studentService.findStudentByFirstNameEmailPhone(search.getKeyword());
         if (allStudents.isEmpty()) {
-            throw new UsernameNotFoundException("Student Not Found");
+            throw new ResourceNotFoundException("Student not Found");
         }
         List<StudentDTO> studentDTOS = EntityModelMapper.studentModelToDto(allStudents.get());
         return new ResponseEntity<>(studentDTOS, HttpStatus.OK);
     }
-    @PostMapping("/secured/addUniversity")
-    public ResponseEntity<?> addUniversity(@RequestBody @Valid Student student, HttpServletRequest request) {
 
-        student.setInterviewDate(null);
-        student.setService(student.getService());
-        student.setIp(IpAndBrowserGetter.getIp(request));
-        student.setLastUpdated(new Date());
-        student.setBrowser(IpAndBrowserGetter.getBrowserAndOs(request));
-        student.setCreated(new Date());
-        student.setIsActive(UserStatus.ACTIVE.get());
-        student.setEnteredBy(request.getUserPrincipal().getName());
-        student.setVisaStatus(VStatus.NOT_APPLIED.get());
-        studentService.addStudent(student);
-        return new ResponseEntity<>(student, HttpStatus.CREATED);
+    @PostMapping("/secured/addUniversity")
+    public ResponseEntity<?> addUniversity(@RequestBody @Valid University university, HttpServletRequest request) throws Exception {
+        University universityByName = universityService.getUniversityByName(university.getUniversityName());
+        if (universityByName != null) {
+            throw new ResourceNotFoundException("University already exists");
+        }
+        university.setIp(IpAndBrowserGetter.getIp(request));
+        university.setBrowser(IpAndBrowserGetter.getBrowserAndOs(request));
+        university.setLastUpdated(new Date());
+        university.setCreated(new Date());
+        university.setEnteredBy(request.getUserPrincipal().getName());
+        university.setApprovalDate(null);
+        university.setIsActive(UserStatus.ACTIVE.get());
+        universityService.saveUniversity(university);
+        return new ResponseEntity<>(university, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/secured/showUniversities")
+    public ResponseEntity<List<UniversityDto>> listUniversities() {
+        List<University> universities = universityService.getAllActiveUniversities();
+        List<UniversityDto> universityDtos = EntityModelMapper.universityEntityToDto(universities);
+        return new ResponseEntity<>(universityDtos, HttpStatus.OK);
     }
 }
