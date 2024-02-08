@@ -35,8 +35,8 @@ public class EntityModelMapper {
             universityDto.setUniversityName(university.getUniversityName());
             universityDto.setAdditionalComments(university.getAdditionalComments());
             universityDto.setLastUpdated(DateFormatter.formatDateToString(university.getLastUpdated(),"MMM dd yyyy", "EST"));
-            universityDto.setApprovalDate(university.getApprovalDate() != null ?
-                    DateFormatter.formatDateToString(university.getApprovalDate(), "MMM dd yyyy", "EST") : "Not yet approved");
+            universityDto.setApprovalDate(university.getApprovalDate() == null ? null :
+                    university.getApprovalDate().toString());
             universityDto.setContactPerson(university.getContactPerson());
             universityDto.setStatus(university.getService());
             universityDto.setPhone(university.getPhone());

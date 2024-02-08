@@ -21,6 +21,7 @@ public class DataSource {
         dataSourceBuilder
                 .password(new String(Base64.getDecoder()
                         .decode(environment.getProperty("spring.datasource.password"))));
+      //  dataSourceBuilder.password(environment.getProperty("spring.datasource.password"));
         return dataSourceBuilder.build();
     }
 }

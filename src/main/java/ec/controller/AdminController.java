@@ -2,6 +2,7 @@ package ec.controller;
 
 import ec.constants.UserStatus;
 import ec.constants.VStatus;
+import ec.exceptions.AlreadyExistsException;
 import ec.exceptions.ResourceNotFoundException;
 import ec.model.*;
 import ec.service.StudentService;
@@ -58,7 +59,7 @@ public class AdminController {
         if (studentById.isEmpty()) {
             throw new ResourceNotFoundException("Student Not Found");
         }
-        var student = new Student();
+        var student = studentById.get();
         student.setId(studentDto.getId());
         student.setFirstName(studentDto.getFirstName());
         student.setLastName(studentDto.getLastName());
@@ -90,6 +91,12 @@ public class AdminController {
         }
         studentService.deleteById(student.getId());
 
+        return new ResponseEntity<>("Deleted Successfully", HttpStatus.OK);
+    }
+
+    @PostMapping("/secured/deleteUniversity")
+    public ResponseEntity<?> deleteUniversity(@RequestBody UniversityDto universityDto) {
+        this.universityService.deleteUniversityById(universityDto.getId());
         return new ResponseEntity<>("Deleted Successfully", HttpStatus.OK);
     }
 
@@ -128,5 +135,32 @@ public class AdminController {
         List<University> universities = universityService.getAllActiveUniversities();
         List<UniversityDto> universityDtos = EntityModelMapper.universityEntityToDto(universities);
         return new ResponseEntity<>(universityDtos, HttpStatus.OK);
+    }
+
+    @PutMapping("/secured/updateUniversity")
+    public ResponseEntity<University> updateUniversity(@RequestBody UniversityDto universityDto,
+                                                       HttpServletRequest request) throws ParseException {
+        Optional<University> universityById = this.universityService.findUniversityById(universityDto.getId());
+        if (universityById.isEmpty()) {
+            throw new ResourceNotFoundException("University Not Found");
+        }
+        var university = universityById.get();
+        university.setId(universityDto.getId());
+        university.setUniversityAddress(universityDto.getUniversityAddress());
+        university.setUniversityAddress1(universityDto.getUniversityAddress1());
+        university.setPhone(universityDto.getPhone());
+        university.setContactPerson(universityDto.getContactPerson());
+        university.setAdditionalComments(universityDto.getAdditionalComments());
+        university.setApprovalDate(DateFormatter.formatStringToDateOnly(universityDto.getApprovalDate(),"yyyy-MM-dd"));
+        university.setEmail(universityDto.getEmail());
+        university.setService(universityDto.getStatus());
+        university.setEnteredBy(request.getUserPrincipal().getName());
+        university.setLastUpdated(new Date());
+        university.setIp(IpAndBrowserGetter.getIp(request));
+        university.setIsActive(UserStatus.ACTIVE.get());
+        university.setBrowser(IpAndBrowserGetter.getBrowserAndOs(request));
+        universityService.saveUniversity(university);
+
+        return new ResponseEntity<>(university, HttpStatus.OK);
     }
 }
