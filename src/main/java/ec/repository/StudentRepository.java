@@ -15,7 +15,7 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     @Query("SELECT s from Student s where s.email = :email and s.isActive = 1")
     Optional<Student> findByEmail(String email);
 
-    @Query("SELECT s from Student s where s.isActive = 1")
+    @Query("SELECT s from Student s where s.isActive = 1 order by s.lastUpdated desc")
     List<Student> findAllActiveStudents();
 
     @Query("UPDATE Student s SET s.isActive = 4 where s.id = :id")

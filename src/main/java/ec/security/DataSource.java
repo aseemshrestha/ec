@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 import java.util.Base64;
+import java.util.Map;
 
 @Configuration
 public class DataSource {
@@ -21,7 +22,7 @@ public class DataSource {
         dataSourceBuilder
                 .password(new String(Base64.getDecoder()
                         .decode(environment.getProperty("spring.datasource.password"))));
-      //  dataSourceBuilder.password(environment.getProperty("spring.datasource.password"));
+        //  dataSourceBuilder.password(environment.getProperty("spring.datasource.password"));
         return dataSourceBuilder.build();
     }
 }

@@ -27,5 +27,23 @@ public class DateFormatter {
         return inputFormat.parse(dateString);
     }
 
+    public static Date formarStringToDate(String dateStr) {
+        if ( "null".equals(dateStr)) {
+            return null;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss 'GMT'Z (zzzz)");
+        Date date = null;
+        try {
+            date = sdf.parse(dateStr);
+        } catch (ParseException e) {
+            try {
+                return formatStringToDateOnly(dateStr, "yyyy-MM-dd");
+            } catch (ParseException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+        return date;
+    }
+
 
 }

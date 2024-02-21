@@ -7,6 +7,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "student")
@@ -32,13 +33,13 @@ public class Student {
     private String phone;
 
     @Column(nullable = false, name = "i20Status")
-    private String service;
+    private String i20Status;
 
     @Column(name = "interviewDate")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date interviewDate;
     @Column(name = "additionalComments")
-    private String message;
+    private String additionalComments;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String ip;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -61,5 +62,7 @@ public class Student {
     private String enteredBy;
     @Column(nullable = false)
     private String visaStatus;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "student", fetch = FetchType.LAZY)
+    private List<Docs> docs;
 
 }

@@ -1,6 +1,9 @@
 package ec.model;
 
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Data
 public class StudentDTO {
@@ -20,5 +23,9 @@ public class StudentDTO {
     private String status;
 
     private String createdDate;
+
+    private MultipartFile[] files;
+
+    private List<String> docs;
 
 }
