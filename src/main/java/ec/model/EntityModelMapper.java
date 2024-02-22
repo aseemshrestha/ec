@@ -27,9 +27,9 @@ public class EntityModelMapper {
             if (s.getDocs() != null) {
                 for (Docs d : s.getDocs()) {
                     String docsLocation = d.getDocsLocation();
-                    String floc = docsLocation.substring(docsLocation.indexOf(path));
+                  //  String floc = docsLocation.substring(docsLocation.indexOf(path));
                     // System.out.println(floc.substring(floc.indexOf('-')+1));
-                    docLocationList.add(floc.substring(floc.indexOf('-') + 1));
+                    docLocationList.add(docsLocation);
                 }
                 studentDTO.setDocs(docLocationList);
             }
